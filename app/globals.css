@@ -29,19 +29,25 @@
 }
 
 html,
-body,
 body {
   min-height: 100%;
+  min-height: 100dvh;
 }
 
 body {
   margin: 0;
   min-width: 320px;
+  overflow-x: hidden;
   background:
     radial-gradient(1200px 600px at 10% -10%, #ffe3ec 0%, transparent 55%),
     radial-gradient(900px 500px at 100% 0%, #ffd9c8 0%, transparent 50%),
     linear-gradient(180deg, #fff8fa 0%, #fff2f5 42%, #ffeef4 100%);
   color: var(--ink);
+  padding:
+    env(safe-area-inset-top, 0)
+    env(safe-area-inset-right, 0)
+    env(safe-area-inset-bottom, 0)
+    env(safe-area-inset-left, 0);
 }
 
 button,
@@ -51,9 +57,21 @@ input {
 
 button {
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 img {
   max-width: 100%;
   display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,9 +1,21 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Mumma Finance',
   description: 'Mumma Finance — a soft, clear fortnightly budgeting companion.',
+  appleWebApp: {
+    capable: true,
+    title: 'Mumma Finance',
+    statusBarStyle: 'default',
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#fff2f5',
 }
 
 export default function RootLayout({
