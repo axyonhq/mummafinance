@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Dashboard } from '@/components/Dashboard'
 import { SetupPanel } from '@/components/SetupPanel'
 import { buildCategoryBuckets, totalFortnightly } from '@/lib/finance'
-import { supabase } from '@/lib/supabase'
+import { errorMessage } from '@/lib/errors'
+import { hasSupabaseConfig, supabase } from '@/lib/supabase'
 import type {
   FinanceItem,
   FinanceItemInsert,
@@ -26,6 +27,11 @@ export default function App() {
     setError(null)
     setSyncing(true)
     try {
+      if (!hasSupabaseConfig) {
+        throw new Error(
+          'Supabase env vars are missing on Vercel. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY, then redeploy.',
+        )
+      }
       await supabase.rpc('sync_temporary_finance_items')
 
       const { data, error: fetchError } = await supabase
@@ -37,7 +43,11 @@ export default function App() {
       if (fetchError) throw fetchError
       setItems((data ?? []) as FinanceItem[])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sync finances.')
+      setError(
+        hasSupabaseConfig
+          ? errorMessage(err, 'Failed to sync finances.')
+          : 'Supabase env vars are missing on Vercel. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY, then redeploy.',
+      )
     } finally {
       setLoading(false)
       setSyncing(false)

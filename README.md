@@ -33,3 +33,15 @@ npm run dev
 ## Dashboard photo
 
 `public/dashboard-photo.jpg` is converted from `IMG_4401.HEIC` and shown in the dashboard hero. A soft floral SVG remains as fallback.
+
+
+## Vercel
+
+Set these **Production** (and Preview) environment variables, then **redeploy**:
+
+- `NEXT_PUBLIC_SUPABASE_URL` — Mumma Finance project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — project anon/public key
+
+Find both in Supabase → Project Settings → API.
+
+`NEXT_PUBLIC_*` values are inlined at build time, so a redeploy is required after changing them.
