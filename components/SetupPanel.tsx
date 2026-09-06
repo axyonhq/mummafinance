@@ -1,5 +1,7 @@
+'use client'
+
 import { useMemo, useState, type FormEvent } from 'react'
-import { CustomSelect } from './CustomSelect'
+import { CustomSelect } from '@/components/CustomSelect'
 import {
   CATEGORY_OPTIONS,
   FREQUENCY_OPTIONS,
@@ -9,12 +11,12 @@ import {
   dollarsToCents,
   formatAud,
   temporaryFortnightCount,
-} from '../lib/finance'
+} from '@/lib/finance'
 import type {
   FinanceItem,
   ItemDuration,
   PaymentFrequency,
-} from '../types/database'
+} from '@/types/database'
 
 type Props = {
   items: FinanceItem[]

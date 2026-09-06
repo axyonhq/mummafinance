@@ -1,4 +1,4 @@
-import type { FinanceItem, PaymentFrequency } from '../types/database'
+import type { FinanceItem, PaymentFrequency } from '@/types/database'
 
 /** Aussie payday convention used by Mumma Finance */
 export function calcFortnightlyCents(
