@@ -1,6 +1,8 @@
-import type { CategoryBucket } from '../lib/finance'
-import { formatAud, formatAudCompact } from '../lib/finance'
-import type { FinanceItem } from '../types/database'
+'use client'
+
+import type { CategoryBucket } from '@/lib/finance'
+import { formatAud, formatAudCompact } from '@/lib/finance'
+import type { FinanceItem } from '@/types/database'
 
 type Props = {
   totalCents: number

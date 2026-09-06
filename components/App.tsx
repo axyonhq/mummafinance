@@ -1,14 +1,16 @@
+'use client'
+
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Dashboard } from './components/Dashboard'
-import { SetupPanel } from './components/SetupPanel'
-import { buildCategoryBuckets, totalFortnightly } from './lib/finance'
-import { supabase } from './lib/supabase'
+import { Dashboard } from '@/components/Dashboard'
+import { SetupPanel } from '@/components/SetupPanel'
+import { buildCategoryBuckets, totalFortnightly } from '@/lib/finance'
+import { supabase } from '@/lib/supabase'
 import type {
   FinanceItem,
   FinanceItemInsert,
   ItemDuration,
   PaymentFrequency,
-} from './types/database'
+} from '@/types/database'
 import './App.css'
 
 type Tab = 'dashboard' | 'setup'

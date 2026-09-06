@@ -1,6 +1,6 @@
 # Mumma Finance
 
-A soft, fortnightly budgeting companion. One page. Two tabs. Everything synced to Supabase.
+A soft, fortnightly budgeting companion built with Next.js. One page. Two tabs. Everything synced to Supabase.
 
 ## Features
 
@@ -26,7 +26,7 @@ Example: monthly `$1,000` → `$500` fortnightly. Four monthly payments = `$4,00
 
 ```bash
 npm install
-cp .env.example .env   # fill with Mumma Finance project URL + anon key
+cp .env.example .env.local   # fill NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_ANON_KEY
 npm run dev
 ```
 
