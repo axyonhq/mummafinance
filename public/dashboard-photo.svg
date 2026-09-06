@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-label="Soft blush floral placeholder for Mumma Finance">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD9E4"/>
+      <stop offset="45%" stop-color="#FFE8EF"/>
+      <stop offset="100%" stop-color="#FFD6C2"/>
+    </linearGradient>
+    <linearGradient id="petal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFF7F9"/>
+      <stop offset="100%" stop-color="#E891A8"/>
+    </linearGradient>
+    <linearGradient id="petal2" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F7A8BC"/>
+      <stop offset="100%" stop-color="#F0A07A"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#bg)"/>
+  <circle cx="180" cy="220" r="120" fill="#fff7f9" opacity="0.45"/>
+  <circle cx="640" cy="760" r="160" fill="#ffc1d4" opacity="0.35"/>
+  <g transform="translate(400 460)">
+    <ellipse rx="90" ry="150" fill="url(#petal)" transform="rotate(0)" opacity="0.95"/>
+    <ellipse rx="90" ry="150" fill="url(#petal2)" transform="rotate(45)" opacity="0.9"/>
+    <ellipse rx="90" ry="150" fill="url(#petal)" transform="rotate(90)" opacity="0.92"/>
+    <ellipse rx="90" ry="150" fill="url(#petal2)" transform="rotate(135)" opacity="0.88"/>
+    <circle r="48" fill="#fff7f9"/>
+    <circle r="26" fill="#E891A8"/>
+  </g>
+  <text x="400" y="820" text-anchor="middle" fill="#6b4a58" font-family="Georgia, serif" font-size="34">Mumma</text>
+  <text x="400" y="865" text-anchor="middle" fill="#9a7382" font-family="Georgia, serif" font-size="18">drop IMG_4401 here as dashboard-photo.jpg</text>
+</svg>
