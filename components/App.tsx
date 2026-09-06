@@ -1,10 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 import { Dashboard } from '@/components/Dashboard'
 import { SetupPanel } from '@/components/SetupPanel'
+import { errorMessage } from '@/lib/errors'
 import { buildCategoryBuckets, totalFortnightly } from '@/lib/finance'
-import { supabase } from '@/lib/supabase'
+import { hasSupabaseConfig, supabase } from '@/lib/supabase'
 import type {
   FinanceItem,
   FinanceItemInsert,
@@ -14,18 +16,28 @@ import type {
 import './App.css'
 
 type Tab = 'dashboard' | 'setup'
+type SyncState = 'connecting' | 'live' | 'syncing' | 'offline'
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('dashboard')
   const [items, setItems] = useState<FinanceItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [syncing, setSyncing] = useState(false)
+  const [syncState, setSyncState] = useState<SyncState>('connecting')
   const [error, setError] = useState<string | null>(null)
+  const refreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const channelRef = useRef<RealtimeChannel | null>(null)
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (reason: 'manual' | 'realtime' | 'focus' = 'manual') => {
     setError(null)
-    setSyncing(true)
+    if (reason !== 'realtime') setSyncState('syncing')
+
     try {
+      if (!hasSupabaseConfig()) {
+        throw new Error(
+          'Supabase env vars are missing on Vercel. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY, then redeploy.',
+        )
+      }
+
       await supabase.rpc('sync_temporary_finance_items')
 
       const { data, error: fetchError } = await supabase
@@ -36,32 +48,80 @@ export default function App() {
 
       if (fetchError) throw fetchError
       setItems((data ?? []) as FinanceItem[])
+      setSyncState((prev) => (prev === 'offline' ? 'connecting' : 'live'))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sync finances.')
+      setError(
+        hasSupabaseConfig()
+          ? errorMessage(err, 'Failed to sync finances.')
+          : 'Supabase env vars are missing on Vercel. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY, then redeploy.',
+      )
+      setSyncState('offline')
     } finally {
       setLoading(false)
-      setSyncing(false)
     }
   }, [])
 
+  const scheduleRefresh = useCallback(
+    (reason: 'realtime' | 'focus' = 'realtime') => {
+      if (refreshTimer.current) clearTimeout(refreshTimer.current)
+      refreshTimer.current = setTimeout(() => {
+        void refresh(reason)
+      }, reason === 'realtime' ? 180 : 0)
+    },
+    [refresh],
+  )
+
   useEffect(() => {
-    void refresh()
+    void refresh('manual')
 
     const channel = supabase
-      .channel('finance_items_live')
+      .channel(`finance_items_live_${crypto.randomUUID()}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'finance_items' },
         () => {
-          void refresh()
+          scheduleRefresh('realtime')
         },
       )
-      .subscribe()
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          setSyncState('live')
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          setSyncState('offline')
+          scheduleRefresh('focus')
+        } else if (status === 'CLOSED') {
+          setSyncState((prev) => (prev === 'syncing' ? prev : 'connecting'))
+        }
+      })
+
+    channelRef.current = channel
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') scheduleRefresh('focus')
+    }
+    const onOnline = () => {
+      setSyncState('connecting')
+      scheduleRefresh('focus')
+    }
+    const onOffline = () => setSyncState('offline')
+
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('focus', onVisible)
+    window.addEventListener('online', onOnline)
+    window.addEventListener('offline', onOffline)
 
     return () => {
-      void supabase.removeChannel(channel)
+      if (refreshTimer.current) clearTimeout(refreshTimer.current)
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('focus', onVisible)
+      window.removeEventListener('online', onOnline)
+      window.removeEventListener('offline', onOffline)
+      if (channelRef.current) {
+        void supabase.removeChannel(channelRef.current)
+        channelRef.current = null
+      }
     }
-  }, [refresh])
+  }, [refresh, scheduleRefresh])
 
   const buckets = useMemo(() => buildCategoryBuckets(items), [items])
   const total = useMemo(() => totalFortnightly(items), [items])
@@ -94,7 +154,7 @@ export default function App() {
       .insert(row)
 
     if (insertError) throw insertError
-    await refresh()
+    await refresh('manual')
     setTab('dashboard')
   }
 
@@ -107,8 +167,17 @@ export default function App() {
       setError(deleteError.message)
       return
     }
-    await refresh()
+    await refresh('manual')
   }
+
+  const syncLabel =
+    syncState === 'live'
+      ? 'Live'
+      : syncState === 'syncing'
+        ? 'Syncing…'
+        : syncState === 'connecting'
+          ? 'Connecting…'
+          : 'Offline'
 
   return (
     <div className="app-shell">
@@ -146,11 +215,13 @@ export default function App() {
 
         <button
           type="button"
-          className="sync-btn"
-          onClick={() => void refresh()}
-          disabled={syncing}
+          className={`sync-btn is-${syncState}`}
+          onClick={() => void refresh('manual')}
+          disabled={syncState === 'syncing'}
+          title="Refresh from Supabase"
         >
-          {syncing ? 'Syncing…' : 'Synced'}
+          <span className="sync-dot" aria-hidden />
+          {syncLabel}
         </button>
       </header>
 
@@ -170,10 +241,27 @@ export default function App() {
             items={items}
             onCreate={handleCreate}
             onDelete={handleDelete}
-            busy={syncing}
+            busy={syncState === 'syncing'}
           />
         )}
       </main>
+
+      <nav className="mobile-tabs" aria-label="Mobile primary">
+        <button
+          type="button"
+          className={tab === 'dashboard' ? 'is-active' : ''}
+          onClick={() => setTab('dashboard')}
+        >
+          Dashboard
+        </button>
+        <button
+          type="button"
+          className={tab === 'setup' ? 'is-active' : ''}
+          onClick={() => setTab('setup')}
+        >
+          Setup
+        </button>
+      </nav>
     </div>
   )
 }

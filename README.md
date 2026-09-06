@@ -33,3 +33,11 @@ npm run dev
 ## Dashboard photo
 
 `public/dashboard-photo.jpg` is converted from `IMG_4401.HEIC` and shown in the dashboard hero. A soft floral SVG remains as fallback.
+
+## Live sync across devices
+
+Changes save to Supabase immediately. Any other open phone or computer receives them over Supabase Realtime, and the app also refreshes when you return to the tab or reconnect.
+
+## Mobile
+
+The layout collapses to a single column under 920px with a sticky bottom tab bar, larger tap targets, and safe-area padding for notched phones.
