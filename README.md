@@ -41,3 +41,14 @@ Changes save to Supabase immediately. Any other open phone or computer receives 
 ## Mobile
 
 The layout collapses to a single column under 920px with a sticky bottom tab bar, larger tap targets, and safe-area padding for notched phones.
+
+## Vercel
+
+Set these **Production** (and Preview) environment variables, then **redeploy**:
+
+- `NEXT_PUBLIC_SUPABASE_URL` — Mumma Finance project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — project anon/public key
+
+Find both in Supabase → Project Settings → API.
+
+`NEXT_PUBLIC_*` values are inlined at build time, so a redeploy is required after changing them.

@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type FormEvent } from 'react'
 import { CustomSelect } from '@/components/CustomSelect'
+import { errorMessage } from '@/lib/errors'
 import {
   CATEGORY_OPTIONS,
   FREQUENCY_OPTIONS,
@@ -105,7 +106,7 @@ export function SetupPanel({ items, onCreate, onDelete, busy }: Props) {
       })
       setForm(emptyForm)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save item.')
+      setError(errorMessage(err, 'Could not save item.'))
     } finally {
       setSaving(false)
     }
