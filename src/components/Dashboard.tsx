@@ -42,7 +42,7 @@ export function Dashboard({ totalCents, buckets, items }: Props) {
         <figure className="dash-photo">
           <img
             src="/dashboard-photo.jpg"
-            alt="Mumma Finance mood photo"
+            alt="Mumma and family"
             onError={(event) => {
               const img = event.currentTarget
               if (img.dataset.fallback === '1') return
@@ -50,7 +50,8 @@ export function Dashboard({ totalCents, buckets, items }: Props) {
               img.src = '/dashboard-photo.svg'
             }}
           />
-          <figcaption>Soft focus · forever budgeting</figcaption>
+          <div className="dash-photo-veil" aria-hidden />
+          <figcaption>For Mumma · with love</figcaption>
         </figure>
       </div>
 

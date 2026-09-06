@@ -32,4 +32,4 @@ npm run dev
 
 ## Dashboard photo
 
-Place your photo at `public/dashboard-photo.jpg` (convert `IMG_4401.HEIC` if needed). Until then, a soft floral SVG placeholder is shown.
+`public/dashboard-photo.jpg` is converted from `IMG_4401.HEIC` and shown in the dashboard hero. A soft floral SVG remains as fallback.
